@@ -1,11 +1,10 @@
 package richard.eldridge.chat;
 
-import static javax.swing.SwingUtilities.invokeAndWait;
-import static javax.swing.UIManager.getCrossPlatformLookAndFeelClassName;
-import static javax.swing.UIManager.setLookAndFeel;
+import richard.eldridge.mycomponents.TitleLabel;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
+import javax.swing.*;
+import javax.swing.text.DefaultCaret;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -17,21 +16,14 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.text.DefaultCaret;
-
-import richard.eldridge.mycomponents.TitleLabel;
+import static javax.swing.UIManager.getCrossPlatformLookAndFeelClassName;
+import static javax.swing.UIManager.setLookAndFeel;
 
 public class ChatServer extends JFrame implements Runnable {
 	private static final int PORT_NUMBER = 63458;
 	private static final long serialVersionUID = 1L;
 	private JTextArea logArea = new JTextArea(10, 30);
-	private JButton startButton = new JButton("Start");
+	private JButton toggleButton = new JButton("Start");
 	private ServerSocket serverSocket;
 	
 
@@ -42,7 +34,7 @@ public class ChatServer extends JFrame implements Runnable {
 		} catch (Exception e) {
 			// do nothing
 		}
-		invokeAndWait(new ChatServer());
+		new ChatServer();
 	}
 
 	public ChatServer() {
@@ -73,24 +65,23 @@ public class ChatServer extends JFrame implements Runnable {
 		// Button panel
 		JPanel buttonPanel = new JPanel();
 		add(buttonPanel, BorderLayout.PAGE_END);
-		startButton.addActionListener(new ActionListener() {
-
+		toggleButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				startServer();
+				toggleServer();
 			}
 		});
-		buttonPanel.add(startButton);
-		getRootPane().setDefaultButton(startButton);
-		
+		buttonPanel.add(toggleButton);
+		getRootPane().setDefaultButton(toggleButton);
+
 		//listeners
-		new WindowAdapter() {
+		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				stop();
 				System.exit(0);
 			}
-		};
+		});
 	}
 
 	public void log(String message) {
@@ -100,18 +91,19 @@ public class ChatServer extends JFrame implements Runnable {
 		logArea.append(timeStamp + ": " + message + "\n");
 	}
 
-
-	private void startServer() {
-		if (startButton.getText().equals("Stop")) {
+	private void toggleServer() {
+		if (toggleButton.getText().equals("Stop")) {
 			//stop the server
-			
+			stop();
+			toggleButton.setText("Start");
 		} else {
-			startButton.setText("Stop");
-			new Thread(this);
+			toggleButton.setText("Stop");
+			new Thread(this).start();
 		}
 	}
-	
+
 	private void stop() {
+		log("Attempting to stop server");
 		if(serverSocket != null && !serverSocket.isClosed()) {
 			try {
 				serverSocket.close();
@@ -124,10 +116,11 @@ public class ChatServer extends JFrame implements Runnable {
 
 	@Override
 	public void run() {
-		log("Server is running...");
+		log("Starting Chat server...");
 		try {
 			serverSocket = new ServerSocket(PORT_NUMBER);
 			while(true) {
+				//TODO separate thread?
 				Socket socket = serverSocket.accept();
 				log("Server is starting a new connection...");
 			}

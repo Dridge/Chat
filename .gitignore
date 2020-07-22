@@ -1,0 +1,10 @@
+# ignore generated html files,
+*.html
+# ignore settings
+.settings
+# ignore classpath
+.classpath
+# ignore built class files
+bin
+# ignore idea files
+.idea

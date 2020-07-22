@@ -8,6 +8,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
@@ -31,6 +33,7 @@ public class ChatServer extends JFrame implements Runnable {
 	private JTextArea logArea = new JTextArea(10, 30);
 	private JButton startButton = new JButton("Start");
 	private ServerSocket serverSocket;
+	
 
 	public static void main(String[] args) throws InvocationTargetException, InterruptedException {
 		try {
@@ -39,12 +42,7 @@ public class ChatServer extends JFrame implements Runnable {
 		} catch (Exception e) {
 			// do nothing
 		}
-		invokeAndWait(new Runnable() {
-			@Override
-			public void run() {
-				new ChatServer();
-			}
-		});
+		invokeAndWait(new ChatServer());
 	}
 
 	public ChatServer() {
@@ -53,7 +51,7 @@ public class ChatServer extends JFrame implements Runnable {
 		pack();
 		setLocationRelativeTo(null);
 		setVisible(true);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 	}
 
 	private void initGui() {
@@ -81,35 +79,18 @@ public class ChatServer extends JFrame implements Runnable {
 			public void actionPerformed(ActionEvent e) {
 				startServer();
 			}
-
-			private void startServer() {
-				startButton.setEnabled(false);
-				new Thread();
-			}
-
-			public void run() {
-				log("Server is running...");
-				try {
-					serverSocket = new ServerSocket(PORT_NUMBER);
-					while(true) {
-						Socket socket = serverSocket.accept();
-						log("Server is starting a new connection...");
-					}
-				} catch (IOException e) {
-					log("An exception was caught while trying to listen on port: " + PORT_NUMBER);
-				} finally {
-					if(! serverSocket.isClosed()) {
-						try {
-							serverSocket.close();
-						} catch (IOException e) {
-							// do nothing
-						}
-					}
-				}
-			}
 		});
 		buttonPanel.add(startButton);
 		getRootPane().setDefaultButton(startButton);
+		
+		//listeners
+		new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				stop();
+				System.exit(0);
+			}
+		};
 	}
 
 	public void log(String message) {
@@ -119,9 +100,49 @@ public class ChatServer extends JFrame implements Runnable {
 		logArea.append(timeStamp + ": " + message + "\n");
 	}
 
+
+	private void startServer() {
+		if (startButton.getText().equals("Stop")) {
+			//stop the server
+			
+		} else {
+			startButton.setText("Stop");
+			new Thread(this);
+		}
+	}
+	
+	private void stop() {
+		if(serverSocket != null && !serverSocket.isClosed()) {
+			try {
+				serverSocket.close();
+			} catch (IOException e) {
+				log("Unable to close the server connection.");
+				log(e.getMessage());
+			}
+		}
+	}
+
 	@Override
 	public void run() {
-		
+		log("Server is running...");
+		try {
+			serverSocket = new ServerSocket(PORT_NUMBER);
+			while(true) {
+				Socket socket = serverSocket.accept();
+				log("Server is starting a new connection...");
+			}
+		} catch (IOException e) {
+			log("An exception was caught while trying to listen on port: " + PORT_NUMBER);
+		} finally {
+			if(serverSocket != null && !serverSocket.isClosed()) {
+				try {
+					serverSocket.close();
+				} catch (IOException e) {
+					log("Unable to close the server connection.");
+					log(e.getMessage());
+				}
+			}
+		}
 	}
 
 }

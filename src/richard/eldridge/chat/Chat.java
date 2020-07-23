@@ -1,30 +1,16 @@
 package richard.eldridge.chat;
 
-import java.awt.BorderLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import richard.eldridge.mycomponents.TitleLabel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
-
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-
-import richard.eldridge.mycomponents.TitleLabel;
 
 public class Chat extends JFrame implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -45,7 +31,7 @@ public class Chat extends JFrame implements Runnable {
 		} catch (Exception e) {
 			// do nothing
 		}
-		SwingUtilities.invokeLater(new Chat());
+		new Chat();
 	}
 
 	public Chat() {
@@ -62,12 +48,12 @@ public class Chat extends JFrame implements Runnable {
 		TitleLabel titleLabel = new TitleLabel("Chat");
 		add(titleLabel, BorderLayout.PAGE_START);
 		// listeners
-		new WindowAdapter() {
+		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				close();
 			}
-		};
+		});
 
 		// main panel
 		JPanel mainPanel = new JPanel();
@@ -88,6 +74,16 @@ public class Chat extends JFrame implements Runnable {
 		mainPanel.add(messageLabel);
 		inputArea.setLineWrap(true);
 		inputArea.setMargin(marginInsets);
+		//enter key gubbins
+		inputArea.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e){
+				int key = e.getKeyCode();
+				if(key == KeyEvent.VK_ENTER) {
+					send();
+				}
+			}
+		});
 		JScrollPane inputScrollPanel = new JScrollPane(inputArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		mainPanel.add(inputScrollPanel);
 		
@@ -96,23 +92,22 @@ public class Chat extends JFrame implements Runnable {
 		add(buttonPanel, BorderLayout.PAGE_END);
 		JButton sendButton = new JButton("Send");
 		sendButton.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				send();
 			}
 		});
 		buttonPanel.add(sendButton);
-		
 	}
 
 	protected void send() {
 		String message = "";
 		message = inputArea.getText().trim();
 		if(message.length() > 0) {
-			System.out.print(message);
+			System.out.println(message);
 			inputArea.setText("");
 		}
+		inputArea.grabFocus();
 	}
 
 	@Override
@@ -121,6 +116,7 @@ public class Chat extends JFrame implements Runnable {
 			socket = new Socket(host, PORT_NUMBER);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream(), true);
+			String input = in.readLine();
 		} catch (ConnectException e) {
 			JOptionPane.showMessageDialog(this, "The server is not running!");
 		} catch (Exception e) {

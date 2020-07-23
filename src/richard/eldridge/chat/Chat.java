@@ -1,6 +1,7 @@
 package richard.eldridge.chat;
 
 import richard.eldridge.mycomponents.TitleLabel;
+import richard.eldridge.networking.LogInDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,6 +25,8 @@ public class Chat extends JFrame implements Runnable {
 	private JTextArea chatArea = new JTextArea(20, 20);
 	private JTextArea inputArea = new JTextArea(3, 20);
 
+	private LogInDialog logInDialog = new LogInDialog("Chat");
+
 	public static void main(String[] args) {
 		try {
 			String className = UIManager.getCrossPlatformLookAndFeelClassName();
@@ -41,7 +44,12 @@ public class Chat extends JFrame implements Runnable {
 		setLocationRelativeTo(null);
 		setVisible(true);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		login();
 		new Thread(this).run();
+	}
+
+	private void login() {
+		logInDialog.login();
 	}
 
 	private void initGUI() {

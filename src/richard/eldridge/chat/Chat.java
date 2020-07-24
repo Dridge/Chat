@@ -50,6 +50,12 @@ public class Chat extends JFrame implements Runnable {
 
 	private void login() {
 		logInDialog.login();
+		if(logInDialog.isCanceled()) {
+			close();
+		}
+		host = logInDialog.getIpAddress();
+		name = logInDialog.getUserName();
+		System.out.println(host + ",  " + name);
 	}
 
 	private void initGUI() {

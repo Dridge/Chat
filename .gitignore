@@ -8,3 +8,4 @@
 bin
 # ignore idea files
 .idea
+out

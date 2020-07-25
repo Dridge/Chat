@@ -154,10 +154,10 @@ public class ChatServer extends JFrame implements Runnable {
 	}
 
 	public void removeConnection(String removeName) {
-		boolean found = false;
+		boolean found;
 		synchronized (connections) {
-			connections.stream().filter(e-> e.getName().equals(removeName));
-
+			found = connections.stream().anyMatch(e-> e.getName().equals(removeName));
+			connections.removeIf(e-> e.getName().equals(removeName));
 		}
 	}
 }

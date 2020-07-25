@@ -69,6 +69,9 @@ public class Connection implements Runnable {
     }
 
     private void quit() {
+        if(!name.equals(DEFAULT_NAME)) {
+            server.removeConnection(name);
+        }
         server.log("Connection ended for " + name + ".");
         try {
             socket.close();

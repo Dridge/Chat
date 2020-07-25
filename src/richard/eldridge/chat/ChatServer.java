@@ -14,7 +14,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static javax.swing.UIManager.getCrossPlatformLookAndFeelClassName;
 import static javax.swing.UIManager.setLookAndFeel;
@@ -25,7 +27,7 @@ public class ChatServer extends JFrame implements Runnable {
 	private JTextArea logArea = new JTextArea(10, 30);
 	private JButton toggleButton = new JButton("Start");
 	private ServerSocket serverSocket;
-	
+	private List<Connection> connections = new ArrayList();
 
 	public static void main(String[] args) throws InvocationTargetException, InterruptedException {
 		try {
@@ -120,9 +122,9 @@ public class ChatServer extends JFrame implements Runnable {
 		try {
 			serverSocket = new ServerSocket(PORT_NUMBER);
 			while(true) {
-				//TODO separate thread?
 				Socket socket = serverSocket.accept();
 				log("Server is starting a new connection...");
+				new Connection(this, socket);
 			}
 		} catch (IOException e) {
 			log("An exception was caught while trying to listen on port: " + PORT_NUMBER);
@@ -138,4 +140,24 @@ public class ChatServer extends JFrame implements Runnable {
 		}
 	}
 
+	public boolean addConnection(Connection newConnection, String newName) {
+		boolean added = false;
+		boolean found;
+		synchronized (connections) {
+			found = connections.stream().anyMatch(e -> e.getName().equals(newName));
+		}
+		if (!found) {
+			connections.add(newConnection);
+			added = true;
+		}
+		return added;
+	}
+
+	public void removeConnection(String removeName) {
+		boolean found = false;
+		synchronized (connections) {
+			connections.stream().filter(e-> e.getName().equals(removeName));
+
+		}
+	}
 }

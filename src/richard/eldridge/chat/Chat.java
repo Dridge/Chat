@@ -130,7 +130,21 @@ public class Chat extends JFrame implements Runnable {
 			socket = new Socket(host, PORT_NUMBER);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream(), true);
+			boolean keepRunning = true;
 			String input = in.readLine();
+			if (input == null) {
+				keepRunning = false;
+			}
+			if (!input.isEmpty() ) {
+				String actionCode = String.valueOf(input.charAt(0));
+				String parameters = input.substring(1);
+				switch(actionCode){
+					case ActionCode.SUBMIT:
+						out.println(ActionCode.NAME + ": " + name);
+						break;
+
+				}
+			}
 		} catch (ConnectException e) {
 			JOptionPane.showMessageDialog(this, "The server is not running!");
 		} catch (Exception e) {
@@ -151,4 +165,6 @@ public class Chat extends JFrame implements Runnable {
 		}
 		System.exit(0);
 	}
+
+
 }

@@ -159,4 +159,10 @@ public class ChatServer extends JFrame implements Runnable {
 			connections.removeIf(e-> e.getName().equals(removeName));
 		}
 	}
+	
+	public void broadcast(String s) {
+		synchronized (connections) {
+			connections.forEach(e -> e.sendToClient(s));
+		}
+	}
 }

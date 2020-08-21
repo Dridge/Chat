@@ -154,6 +154,14 @@ public class Chat extends JFrame implements Runnable {
 					case ActionCode.QUIT:
 						keepRunning = false;
 						break;
+					case ActionCode.CHAT:
+						Toolkit.getDefaultToolkit().beep();
+						chatArea.append(parameters + "\n\n");
+						//scroll the chat area
+						String text = chatArea.getText();
+						Integer endOFText = text.length();
+						chatArea.setCaretPosition(endOFText);
+						break;
 				}
 			}
 		} catch (ConnectException e) {

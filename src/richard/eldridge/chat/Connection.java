@@ -54,10 +54,13 @@ public class Connection implements Runnable {
 	                        validName = true;
 	                        name = submittedName;
 	                        sendToClient(ActionCode.ACCEPTED);
+	                        String message = ActionCode.CHAT + ": " + name + " has joined the chat";
+	                        server.broadcast(message);
 	                    } else {
 	                        sendToClient(ActionCode.REJECTED);
 	                    }
                     	break;
+                        	
                     }
                 }
             }

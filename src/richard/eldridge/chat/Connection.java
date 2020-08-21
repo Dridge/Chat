@@ -44,19 +44,20 @@ public class Connection implements Runnable {
                 if(!input.isEmpty()) {
                     String actionCode = String.valueOf(input.charAt(0));
                     String parameters = input.substring(1);
-                    String submittedName;
-                    boolean added = false;
+                    String submittedName = "";
                     switch(actionCode){
-                        case ActionCode.NAME: submittedName = parameters;
-                            added = server.addConnection(this, name);
-
-                    }
-                    if(added) {
-                        validName = true;
-                        submittedName = name;
-                        sendToClient(ActionCode.ACCEPTED);
-                    } else {
-                        sendToClient(ActionCode.REJECTED);
+                        case ActionCode.NAME:
+                    		submittedName = parameters;
+                            boolean added = server.addConnection(this, name);
+                            out.print(name);
+	                    if(added) {
+	                        validName = true;
+	                        name = submittedName;
+	                        sendToClient(ActionCode.ACCEPTED);
+	                    } else {
+	                        sendToClient(ActionCode.REJECTED);
+	                    }
+                    	break;
                     }
                 }
             }
@@ -69,10 +70,10 @@ public class Connection implements Runnable {
     }
 
     private void quit() {
+    	server.log("Connection ended for " + name + ".");
         if(!name.equals(DEFAULT_NAME)) {
             server.removeConnection(name);
         }
-        server.log("Connection ended for " + name + ".");
         try {
             socket.close();
         } catch (IOException e) {

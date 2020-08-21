@@ -27,7 +27,7 @@ public class ChatServer extends JFrame implements Runnable {
 	private JTextArea logArea = new JTextArea(10, 30);
 	private JButton toggleButton = new JButton("Start");
 	private ServerSocket serverSocket;
-	private List<Connection> connections = new ArrayList();
+	private List<Connection> connections = new ArrayList<Connection>();
 
 	public static void main(String[] args) throws InvocationTargetException, InterruptedException {
 		try {
@@ -119,8 +119,7 @@ public class ChatServer extends JFrame implements Runnable {
 	@Override
 	public void run() {
 		log("Starting Chat server...");
-		try {
-			serverSocket = new ServerSocket(PORT_NUMBER);
+		try (ServerSocket serverSocket = new ServerSocket(PORT_NUMBER)){
 			while(true) {
 				Socket socket = serverSocket.accept();
 				log("Server is starting a new connection...");
@@ -128,16 +127,18 @@ public class ChatServer extends JFrame implements Runnable {
 			}
 		} catch (IOException e) {
 			log("An exception was caught while trying to listen on port: " + PORT_NUMBER);
-		} finally {
-			if(serverSocket != null && !serverSocket.isClosed()) {
-				try {
-					serverSocket.close();
-				} catch (IOException e) {
-					log("Unable to close the server connection.");
-					log(e.getMessage());
-				}
-			}
 		}
+		//TODO remove if serverSocket can remove local
+//		} finally {
+//			if(serverSocket != null && !serverSocket.isClosed()) {
+//				try {
+//					serverSocket.close();
+//				} catch (IOException e) {
+//					log("Unable to close the server connection.");
+//					log(e.getMessage());
+//				}
+//			}
+//		}
 	}
 
 	public boolean addConnection(Connection newConnection, String newName) {
@@ -154,9 +155,7 @@ public class ChatServer extends JFrame implements Runnable {
 	}
 
 	public void removeConnection(String removeName) {
-		boolean found;
 		synchronized (connections) {
-			found = connections.stream().anyMatch(e-> e.getName().equals(removeName));
 			connections.removeIf(e-> e.getName().equals(removeName));
 		}
 	}

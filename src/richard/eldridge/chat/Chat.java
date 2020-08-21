@@ -142,7 +142,18 @@ public class Chat extends JFrame implements Runnable {
 					case ActionCode.SUBMIT:
 						out.println(ActionCode.NAME + ": " + name);
 						break;
-
+					case ActionCode.ACCEPTED:
+						setTitle(name);
+						inputArea.requestFocus();
+						break;
+					case ActionCode.REJECTED:
+						JOptionPane.showMessageDialog(this, "User name " + name + " is not available.");
+						login();
+						out.print(ActionCode.NAME + ": " + name);
+						break;
+					case ActionCode.QUIT:
+						keepRunning = false;
+						break;
 				}
 			}
 		} catch (ConnectException e) {

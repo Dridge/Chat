@@ -140,7 +140,7 @@ public class Chat extends JFrame implements Runnable {
 					String parameters = input.substring(1);
 					switch (actionCode) {
 						case ActionCode.SUBMIT:
-							out.println(ActionCode.NAME + ": " + name);
+							out.println(ActionCode.NAME + name);
 							break;
 						case ActionCode.ACCEPTED:
 							setTitle(name);
@@ -149,7 +149,7 @@ public class Chat extends JFrame implements Runnable {
 						case ActionCode.REJECTED:
 							JOptionPane.showMessageDialog(this, "User name " + name + " is not available.");
 							login();
-							out.println(ActionCode.NAME + ": " + name);
+							out.println(ActionCode.NAME + name);
 							break;
 						case ActionCode.QUIT:
 							keepRunning = false;

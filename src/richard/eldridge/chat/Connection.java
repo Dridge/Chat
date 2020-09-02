@@ -44,7 +44,7 @@ public class Connection implements Runnable {
                                 validName = true;
                                 name = submittedName;
                                 sendToClient(ActionCode.ACCEPTED);
-                                String message = ActionCode.CHAT + ": " + name + " has joined the chat";
+                                String message = ActionCode.CHAT + name + " has joined the chat";
                                 server.broadcast(message);
                             } else {
                                 sendToClient(ActionCode.REJECTED);
@@ -82,7 +82,7 @@ public class Connection implements Runnable {
 
     public void sendToClient(String s){
         out.println(s);
-        server.log("Sent: " + s + ", to: " + name);
+        server.log("Sent: " + s + ", to " + name);
     }
 
     public String getName() {

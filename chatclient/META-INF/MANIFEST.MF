@@ -1,0 +1,2 @@
+Manifest-Version: 1.0
+Main-Class: richard.eldridge.chat.Chat

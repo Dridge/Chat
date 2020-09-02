@@ -132,10 +132,7 @@ public class Chat extends JFrame implements Runnable {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			boolean keepRunning = true;
 			String input = in.readLine();
-			if (input == null) {
-				keepRunning = false;
-			}
-			if (!input.isEmpty() ) {
+			if (null != input && !input.isEmpty() ) {
 				String actionCode = String.valueOf(input.charAt(0));
 				String parameters = input.substring(1);
 				switch(actionCode){

@@ -19,13 +19,7 @@ public class Connection implements Runnable {
         this.socket = socket;
         new Thread(this).run();
     }
-    //TODO 'trusted authorisers log in style'
-        // a key word, password, code is sent to a named 'trusted' person who has logged into the chat
-        // whatsapp, but secure
-        // whatsapp, but invite only
-        // free speech, free expression
-        // one rule: don't repeatedly call for or insight other to commit acts of violence against another user
-            // three strikes and your out
+
     @Override
     public void run() {
         try{
@@ -33,36 +27,32 @@ public class Connection implements Runnable {
             out = new PrintWriter(socket.getOutputStream(), true);
             sendToClient(ActionCode.SUBMIT);
             boolean validName = false;
-            boolean keepRunning = true;
-            while (keepRunning) {
+            //boolean keepRunning = true;
+            while (true) {
                 String input = in.readLine();
                 server.log("Input received from: " + name + ": " + input);
-                if(null == input) {
-                    keepRunning = false;
-                }
+                if(null != input && !input.isEmpty()) {
+                        String actionCode = String.valueOf(input.charAt(0));
+                        String parameters = input.substring(1);
+                        String submittedName = "";
+                        switch (actionCode) {
+                            case ActionCode.NAME:
+                                submittedName = parameters;
+                                boolean added = server.addConnection(this, name);
+                                out.print(name);
+                                if (added) {
+                                    validName = true;
+                                    name = submittedName;
+                                    sendToClient(ActionCode.ACCEPTED);
+                                    String message = ActionCode.CHAT + ": " + name + " has joined the chat";
+                                    server.broadcast(message);
+                                } else {
+                                    sendToClient(ActionCode.REJECTED);
+                                }
+                                break;
 
-                if(!input.isEmpty()) {
-                    String actionCode = String.valueOf(input.charAt(0));
-                    String parameters = input.substring(1);
-                    String submittedName = "";
-                    switch(actionCode){
-                        case ActionCode.NAME:
-                    		submittedName = parameters;
-                            boolean added = server.addConnection(this, name);
-                            out.print(name);
-	                    if(added) {
-	                        validName = true;
-	                        name = submittedName;
-	                        sendToClient(ActionCode.ACCEPTED);
-	                        String message = ActionCode.CHAT + ": " + name + " has joined the chat";
-	                        server.broadcast(message);
-	                    } else {
-	                        sendToClient(ActionCode.REJECTED);
-	                    }
-                    	break;
-                        	
+                        }
                     }
-                }
             }
         } catch (IOException e) {
             server.log("Error occurred when connecting to a new client or communicating with that client");

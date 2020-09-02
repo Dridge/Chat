@@ -118,8 +118,8 @@ public class Chat extends JFrame implements Runnable {
 		String message = "";
 		message = inputArea.getText().trim();
 		if(message.length() > 0) {
-			System.out.println(message);
 			inputArea.setText("");
+			out.println(ActionCode.BROADCAST + name + ": " +  message);
 		}
 		inputArea.grabFocus();
 	}
@@ -131,34 +131,38 @@ public class Chat extends JFrame implements Runnable {
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream(), true);
 			boolean keepRunning = true;
-			String input = in.readLine();
-			if (null != input && !input.isEmpty() ) {
-				String actionCode = String.valueOf(input.charAt(0));
-				String parameters = input.substring(1);
-				switch(actionCode){
-					case ActionCode.SUBMIT:
-						out.println(ActionCode.NAME + ": " + name);
-						break;
-					case ActionCode.ACCEPTED:
-						setTitle(name);
-						inputArea.requestFocus();
-						break;
-					case ActionCode.REJECTED:
-						JOptionPane.showMessageDialog(this, "User name " + name + " is not available.");
-						login();
-						out.print(ActionCode.NAME + ": " + name);
-						break;
-					case ActionCode.QUIT:
-						keepRunning = false;
-						break;
-					case ActionCode.CHAT:
-						Toolkit.getDefaultToolkit().beep();
-						chatArea.append(parameters + "\n\n");
-						//scroll the chat area
-						String text = chatArea.getText();
-						Integer endOFText = text.length();
-						chatArea.setCaretPosition(endOFText);
-						break;
+			while(keepRunning) {
+				String input = in.readLine();
+				if (null == input || input.isEmpty()) {
+					keepRunning = false;
+				} else {
+					String actionCode = String.valueOf(input.charAt(0));
+					String parameters = input.substring(1);
+					switch (actionCode) {
+						case ActionCode.SUBMIT:
+							out.println(ActionCode.NAME + ": " + name);
+							break;
+						case ActionCode.ACCEPTED:
+							setTitle(name);
+							inputArea.requestFocus();
+							break;
+						case ActionCode.REJECTED:
+							JOptionPane.showMessageDialog(this, "User name " + name + " is not available.");
+							login();
+							out.println(ActionCode.NAME + ": " + name);
+							break;
+						case ActionCode.QUIT:
+							keepRunning = false;
+							break;
+						case ActionCode.CHAT:
+							Toolkit.getDefaultToolkit().beep();
+							chatArea.append(parameters + "\n\n");
+							//scroll the chat area
+							String text = chatArea.getText();
+							Integer endOFText = text.length();
+							chatArea.setCaretPosition(endOFText);
+							break;
+					}
 				}
 			}
 		} catch (ConnectException e) {
@@ -171,13 +175,16 @@ public class Chat extends JFrame implements Runnable {
 	}
 
 	private void close() {
-		if (socket != null) {
-			try {
-				socket.close();
-			} catch (IOException e) {
-				// do nothing
-				e.printStackTrace();
+		try {
+			if(out != null) {
+				out.println(ActionCode.QUIT);
 			}
+			if (socket != null) {
+				socket.close();
+			}
+		} catch (IOException e) {
+			// do nothing
+			e.printStackTrace();
 		}
 		System.exit(0);
 	}

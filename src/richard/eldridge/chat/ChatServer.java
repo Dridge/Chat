@@ -128,17 +128,6 @@ public class ChatServer extends JFrame implements Runnable {
 		} catch (IOException e) {
 			log("An exception was caught while trying to listen on port: " + PORT_NUMBER);
 		}
-		//TODO remove if serverSocket can remove local
-//		} finally {
-//			if(serverSocket != null && !serverSocket.isClosed()) {
-//				try {
-//					serverSocket.close();
-//				} catch (IOException e) {
-//					log("Unable to close the server connection.");
-//					log(e.getMessage());
-//				}
-//			}
-//		}
 	}
 
 	public boolean addConnection(Connection newConnection, String newName) {

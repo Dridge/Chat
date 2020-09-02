@@ -17,7 +17,7 @@ public class Connection implements Runnable {
     Connection(ChatServer server, Socket socket) {
         this.server = server;
         this.socket = socket;
-        new Thread(this).run();
+        new Thread(this).start();
     }
 
     @Override
@@ -27,32 +27,38 @@ public class Connection implements Runnable {
             out = new PrintWriter(socket.getOutputStream(), true);
             sendToClient(ActionCode.SUBMIT);
             boolean validName = false;
-            //boolean keepRunning = true;
-            while (true) {
+            boolean keepRunning = true;
+            while (keepRunning) {
                 String input = in.readLine();
                 server.log("Input received from: " + name + ": " + input);
                 if(null != input && !input.isEmpty()) {
-                        String actionCode = String.valueOf(input.charAt(0));
-                        String parameters = input.substring(1);
-                        String submittedName = "";
-                        switch (actionCode) {
-                            case ActionCode.NAME:
-                                submittedName = parameters;
-                                boolean added = server.addConnection(this, name);
-                                out.print(name);
-                                if (added) {
-                                    validName = true;
-                                    name = submittedName;
-                                    sendToClient(ActionCode.ACCEPTED);
-                                    String message = ActionCode.CHAT + ": " + name + " has joined the chat";
-                                    server.broadcast(message);
-                                } else {
-                                    sendToClient(ActionCode.REJECTED);
-                                }
-                                break;
-
-                        }
+                    String actionCode = String.valueOf(input.charAt(0));
+                    String parameters = input.substring(1);
+                    String submittedName = "";
+                    switch (actionCode) {
+                        case ActionCode.NAME:
+                            submittedName = parameters;
+                            boolean added = server.addConnection(this, name);
+                            out.print(name);
+                            if (added) {
+                                validName = true;
+                                name = submittedName;
+                                sendToClient(ActionCode.ACCEPTED);
+                                String message = ActionCode.CHAT + ": " + name + " has joined the chat";
+                                server.broadcast(message);
+                            } else {
+                                sendToClient(ActionCode.REJECTED);
+                            }
+                            break;
+                        case ActionCode.BROADCAST:
+                            if(validName) {
+                                server.broadcast(ActionCode.CHAT + parameters);
+                            }
+                            break;
                     }
+                } else {
+                    keepRunning = false;
+                }
             }
         } catch (IOException e) {
             server.log("Error occurred when connecting to a new client or communicating with that client");

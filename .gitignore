@@ -10,3 +10,5 @@ classes
 # ignore idea files
 .idea
 out
+# log files
+*.log

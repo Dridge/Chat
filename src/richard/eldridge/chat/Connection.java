@@ -75,6 +75,7 @@ public class Connection implements Runnable {
         }
         try {
             socket.close();
+            server.broadcast(name + " just left the chat");
         } catch (IOException e) {
             //do nothing
         }

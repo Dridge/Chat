@@ -16,7 +16,7 @@ import java.net.Socket;
 public class Chat extends JFrame implements Runnable {
 	private static final long serialVersionUID = 1L;
 	public static final int PORT_NUMBER = 63458;
-	private String name = "someName";
+	private String name = "";
 	private String host = "localhost";
 	private Socket socket;
 	private BufferedReader in;
@@ -56,6 +56,7 @@ public class Chat extends JFrame implements Runnable {
 		host = logInDialog.getIpAddress();
 		name = logInDialog.getUserName();
 		System.out.println(host + ",  " + name);
+		setTitle("Chat - " + name);
 	}
 
 	private void initGUI() {
@@ -114,7 +115,7 @@ public class Chat extends JFrame implements Runnable {
 		buttonPanel.add(sendButton);
 	}
 
-	protected void send() {
+	private void send() {
 		String message = "";
 		message = inputArea.getText().trim();
 		if(message.length() > 0) {

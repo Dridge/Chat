@@ -158,10 +158,12 @@ public class Chat extends JFrame implements Runnable {
 						case ActionCode.CHAT:
 							Toolkit.getDefaultToolkit().beep();
 							chatArea.append(parameters + "\n\n");
-							//scroll the chat area
-							String text = chatArea.getText();
-							Integer endOFText = text.length();
-							chatArea.setCaretPosition(endOFText);
+							scrollChatArea();
+							break;
+						case ActionCode.DISCONNECT:
+							Toolkit.getDefaultToolkit().beep();
+							JOptionPane.showMessageDialog(this, "Server disconnected");
+							login();
 							break;
 					}
 				}
@@ -173,6 +175,12 @@ public class Chat extends JFrame implements Runnable {
 		} finally {
 			close();
 		}
+	}
+
+	private void scrollChatArea() {
+		String text = chatArea.getText();
+		Integer endOFText = text.length();
+		chatArea.setCaretPosition(endOFText);
 	}
 
 	private void close() {

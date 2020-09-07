@@ -6,6 +6,7 @@ public class ActionCode {
     public static final String ACCEPTED = "A";
     public static final String REJECTED = "R";
     public static final String CHAT = "C";
+    public static final String DISCONNECT = "D";
 
     //actions codes sent from the client to the server
     public static final String NAME = "N";

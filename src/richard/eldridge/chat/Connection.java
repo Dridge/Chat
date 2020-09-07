@@ -72,6 +72,11 @@ public class Connection implements Runnable {
     	server.log("Connection ended for " + name + ".");
         if(!name.equals(DEFAULT_NAME)) {
             server.removeConnection(name);
+            if (out != null) {
+            	String s = ActionCode.CHAT;
+            	server.broadcast(s + name + " has left the chat");
+            	out = null;
+            }
         }
         try {
             socket.close();
@@ -83,6 +88,12 @@ public class Connection implements Runnable {
 
     public void sendToClient(String s){
         out.println(s);
+        if(null != s && !s.isEmpty()) {
+            String actionCode = String.valueOf(s.charAt(0));
+	        if(ActionCode.DISCONNECT == actionCode) {
+	        	quit();
+	        }
+        }
         server.log("Sent: " + s + ", to " + name);
     }
 

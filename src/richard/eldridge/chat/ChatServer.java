@@ -105,7 +105,8 @@ public class ChatServer extends JFrame implements Runnable {
 	}
 
 	private void stop() {
-		log("Attempting to stop server");
+		log("Attempting to stop server, attempt to disconnect clients first");
+		broadcast(ActionCode.DISCONNECT + "Stopping server...");
 		if(serverSocket != null && !serverSocket.isClosed()) {
 			try {
 				serverSocket.close();
